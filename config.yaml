@@ -1,0 +1,4 @@
+Websocket:
+  Port: 12345
+rabbitmq:
+  url: amqp://user:xxx@k8s-rabbitmq.devops.svc.cluster.local:5672/
