@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"encoding/json"
 	"io"
 	"net"
 	"time"
@@ -8,10 +9,12 @@ import (
 
 type Connection struct {
 	conn net.Conn
+	uuid string
 }
 
-func NewConnection(conn net.Conn) *Connection {
-	c := &Connection{conn: conn}
+func NewConnection(uuid string, conn net.Conn) *Connection {
+	c := &Connection{conn: conn, uuid: uuid}
+	c.connectionSuccessNotify()
 	go c.heartbeat()
 
 	return c
@@ -27,6 +30,15 @@ func (c *Connection) heartbeat() {
 
 func (c *Connection) Forward() {
 	io.Copy(c.conn, c.conn)
+}
+
+func (c *Connection) connectionSuccessNotify() {
+	body, _ := json.Marshal(Message{
+		Id:      c.uuid,
+		Type:    CONNECTED,
+		Payload: "",
+	})
+	_, _ = c.conn.Write(body)
 }
 
 // 连接

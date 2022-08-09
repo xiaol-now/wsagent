@@ -4,6 +4,6 @@ import "wsagent/cmd"
 
 func main() {
 	if err := cmd.RootCmd.Execute(); err != nil {
-		panic(err)
+		panic(any(err))
 	}
 }

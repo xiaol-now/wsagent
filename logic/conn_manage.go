@@ -3,7 +3,7 @@ package logic
 import (
 	"sync"
 
-	"github.com/google/uuid"
+	guuid "github.com/google/uuid"
 )
 
 type ConnManage struct {
@@ -33,5 +33,5 @@ func (cm *ConnManage) GetConn(uuid string) *Connection {
 }
 
 func newUuid() string {
-	return uuid.New().String()
+	return guuid.New().String()
 }
