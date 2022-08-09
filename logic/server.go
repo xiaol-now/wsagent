@@ -19,15 +19,19 @@ func NewWebSocketServer(ctx context.Context) *WebSocketServer {
 }
 
 func (wss *WebSocketServer) HandlerConn() websocket.Handler {
-	return websocket.Handler(func(ws *websocket.Conn) {
-		conn := NewConnection(ws)
+	return func(ws *websocket.Conn) {
+		defer func() {
+			println("连接已断开")
+		}()
+
+		conn := NewConnection("todo123", ws)
 		wss.connManage.AddConn(conn)
 		// conn := NewConnection(ws)
 		// 创建一个
 		println("已建立一个连接", ws.LocalAddr())
 		// io.Copy(conn, conn)
 		conn.Forward()
-	})
+	}
 }
 
 func (wss *WebSocketServer) Serve() error {

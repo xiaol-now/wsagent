@@ -1,7 +1,29 @@
 package message
 
 import (
-	_ "github.com/streadway/amqp"
+	"github.com/streadway/amqp"
+	"sync/atomic"
 )
 
-// TODO
+type Session struct {
+	url  string
+	conn *atomic.Value
+}
+
+func NewSession(url string) {
+}
+
+func (s *Session) protect() {
+	for {
+		conn, err := amqp.Dial(s.url)
+		_ = err
+
+		s.conn.Store(conn)
+		reconnect := make(chan *amqp.Error)
+		conn.NotifyClose(reconnect)
+		if err := <-reconnect; err != nil {
+			s.conn = &atomic.Value{}
+
+		}
+	}
+}
