@@ -31,7 +31,7 @@ func TestConsumer(t *testing.T) {
 	}
 	for d := range deliveries {
 		t.Log(string(d.Body))
-		d.Ack(false)
+		_ = d.Ack(false)
 		break
 	}
 }

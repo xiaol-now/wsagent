@@ -13,7 +13,10 @@ func NewDirectProducer(sess *Session, exchange string, routingKey string) (*Prod
 	if err != nil {
 		return nil, err
 	}
-	c.ExchangeDeclare(exchange, "direct", true, false, false, false, nil)
+	err = c.ExchangeDeclare(exchange, "direct", true, false, false, false, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	// c.Confirm(false)
 

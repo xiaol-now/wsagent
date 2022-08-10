@@ -2,16 +2,22 @@ package logic
 
 import (
 	"sync"
+	"wsagent/internal/message"
 
 	guuid "github.com/google/uuid"
 )
 
 type ConnManage struct {
-	conns *sync.Map
+	conns     *sync.Map
+	msgserver *message.MessageServer
 }
 
-func NewConnManage() *ConnManage {
-	return &ConnManage{conns: &sync.Map{}}
+func NewConnManage() (*ConnManage, error) {
+	msgserver, err := message.NewMessageServer()
+	if err != nil {
+		return nil, err
+	}
+	return &ConnManage{conns: &sync.Map{}, msgserver: msgserver}, nil
 }
 
 func (cm *ConnManage) AddConn(conn *Connection) string {

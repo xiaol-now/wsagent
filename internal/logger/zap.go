@@ -86,7 +86,7 @@ type Logger struct {
 // New create a new logger (not support log rotating).
 func New(writer io.Writer, level Level) *Logger {
 	if writer == nil {
-		panic("the writer is nil")
+		panic(any("the writer is nil"))
 	}
 	cfg := zap.NewProductionConfig()
 	cfg.EncoderConfig.EncodeTime = func(t time.Time, pae zapcore.PrimitiveArrayEncoder) {
@@ -95,7 +95,7 @@ func New(writer io.Writer, level Level) *Logger {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(cfg.EncoderConfig),
 		zapcore.AddSync(writer),
-		zapcore.Level(level),
+		level,
 	)
 	logger := &Logger{
 		l:     zap.New(core),

@@ -12,7 +12,7 @@ var ServerCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx, cancel := context.WithCancel(context.Background())
 		SignalObserve(cancel)
-		s := logic.NewWebSocketServer(ctx)
+		s, _ := logic.NewWebSocketServer(ctx)
 		_ = s.Serve()
 	},
 }

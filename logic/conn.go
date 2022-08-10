@@ -1,20 +1,21 @@
 package logic
 
 import (
-	"encoding/json"
 	"io"
 	"net"
 	"time"
+	"wsagent/logic/codec"
 )
 
 type Connection struct {
+	cc   *codec.JsonCodec
 	conn net.Conn
 	uuid string
 }
 
-func NewConnection(uuid string, conn net.Conn) *Connection {
-	c := &Connection{conn: conn, uuid: uuid}
-	c.connectionSuccessNotify()
+func NewConnection(conn net.Conn) *Connection {
+	cc := codec.NewJsonCodec(conn)
+	c := &Connection{conn: conn, cc: cc}
 	go c.heartbeat()
 
 	return c
@@ -29,16 +30,15 @@ func (c *Connection) heartbeat() {
 }
 
 func (c *Connection) Forward() {
+
 	io.Copy(c.conn, c.conn)
 }
 
-func (c *Connection) connectionSuccessNotify() {
-	body, _ := json.Marshal(Message{
-		Id:      c.uuid,
-		Type:    CONNECTED,
-		Payload: "",
-	})
-	_, _ = c.conn.Write(body)
+func (c *Connection) Close() {
+
+}
+func (c *Connection) broadcastMessage() {
+
 }
 
 // 连接

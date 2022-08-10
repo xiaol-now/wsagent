@@ -2,9 +2,8 @@ package logic
 
 import (
 	"context"
-	"net/http"
-
 	"golang.org/x/net/websocket"
+	"net/http"
 )
 
 type WebSocketServer struct {
@@ -12,29 +11,36 @@ type WebSocketServer struct {
 	connManage *ConnManage
 }
 
-func NewWebSocketServer(ctx context.Context) *WebSocketServer {
+func NewWebSocketServer(ctx context.Context) (*WebSocketServer, error) {
 	// 创建一个message server
-
-	return &WebSocketServer{ctx: ctx, connManage: NewConnManage()}
+	connManage, err := NewConnManage()
+	if err != nil {
+		return nil, err
+	}
+	return &WebSocketServer{ctx: ctx, connManage: connManage}, nil
 }
 
-func (wss *WebSocketServer) HandlerConn() websocket.Handler {
-	return func(ws *websocket.Conn) {
-		defer func() {
-			println("连接已断开")
-		}()
+func (ws *WebSocketServer) HandlerConn() websocket.Handler {
+	return func(wsconn *websocket.Conn) {
+		conn := NewConnection(wsconn)
+		defer conn.Close()
+		ws.connManage.AddConn(conn)
 
-		conn := NewConnection("todo123", ws)
-		wss.connManage.AddConn(conn)
-		// conn := NewConnection(ws)
-		// 创建一个
-		println("已建立一个连接", ws.LocalAddr())
-		// io.Copy(conn, conn)
-		conn.Forward()
+		//defer func() {
+		//	println("连接已断开")
+		//}()
+		//
+		//conn := NewConnection("todo123", ws)
+		//ws.connManage.AddConn(conn)
+		//// conn := NewConnection(ws)
+		//// 创建一个
+		//println("已建立一个连接", ws.LocalAddr())
+		//// io.Copy(conn, conn)
+		//conn.Forward()
 	}
 }
 
-func (wss *WebSocketServer) Serve() error {
-	http.Handle("/echo", wss.HandlerConn())
+func (ws *WebSocketServer) Serve() error {
+	http.Handle("/echo", ws.HandlerConn())
 	return http.ListenAndServe(":12345", nil)
 }
